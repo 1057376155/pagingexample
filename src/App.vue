@@ -1,17 +1,45 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ul>
+      <li v-for="(item,index) in list" :key="index">
+        <span>{{item.userName}}</span> - <span>{{item.address}}</span>
+      </li>
+    </ul>
+    <Pagination @change="getList" :defaultIndex="defaultIndex" :pageSize="this.pageSize" :total="this.total"></Pagination>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import Pagination from './components/Pagination.vue'
+import axios from 'axios'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Pagination
+  },
+  data(){
+    return{
+      list:[],
+      pageSize:10,
+      total:0,
+      defaultIndex:6
+    }
+  },
+  mounted(){
+   this.getList(this.defaultIndex)
+  },
+  methods:{
+    change(index){
+     this.getList(index)
+    },
+    getList(index){
+      axios.get(`http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=${index}`).then((r)=>{
+          if(r.data.code==200){
+            this.list=r.data.data.list
+            this.total=parseInt(r.data.data.page.itemSum)
+          }
+        })
+    }
   }
 }
 </script>
